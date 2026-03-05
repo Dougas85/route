@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Painel de Auditoria de Rotas</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- MENU LATERAL -->
+    <aside class="sidebar">
+        <h2>Ações</h2>
+        <ul>
+            <li class="active">Comparador</li>
+            <li>Histórico</li>
+            <li>Relatórios</li>
+        </ul>
+    </aside>
+
+    <!-- CONTEÚDO -->
+    <main class="content">
+
+        <header class="topbar">
+            <h1>Comparador de Rotas TMS</h1>
+        </header>
+
+        <form method="POST" enctype="multipart/form-data" class="upload-card" id="uploadForm">
+
+            <div class="upload-group">
+                <input type="file" name="rota1" id="rota1" accept=".kmz" hidden>
+                <button type="button" class="upload-btn" id="btn1">
+                    📍 Upload Rota 1
+                </button>
+                <div id="file-name1" class="file-name"></div>
+            </div>
+
+            <div class="upload-group">
+                <input type="file" name="rota2" id="rota2" accept=".kmz" hidden>
+                <button type="button" class="upload-btn" id="btn2">
+                    📍 Upload Rota 2
+                </button>
+                <div id="file-name2" class="file-name"></div>
+            </div>
+
+            <button type="submit" class="btn-compare" id="compareBtn" disabled>
+                Comparar Rotas
+            </button>
+
+        </form>
+
+        <!-- LOADING -->
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            Processando rotas...
+        </div>
+        {% if mapa1 or mapa2 %}
+        <div class="maps-container">
+
+            <!-- MAPA 1 -->
+            <div class="map-card">
+
+                <div class="map-header">
+                    <h3>Rota 1</h3>
+
+                    <button onclick="toggleFullscreen('map1')" class="btn-full">
+                        ⛶
+                    </button>
+                </div>
+
+                <div class="map-content" id="map1">
+                    {{ mapa1|safe }}
+                </div>
+
+            </div>
+
+            <!-- MAPA 2 -->
+            <div class="map-card">
+
+                <div class="map-header">
+                    <h3>Rota 2</h3>
+
+                    <button onclick="toggleFullscreen('map2')" class="btn-full">
+                        ⛶
+                    </button>
+                </div>
+
+                <div class="map-content" id="map2">
+                    {{ mapa2|safe }}
+                </div>
+
+            </div>
+
+        </div>
+        {% endif %}
+        
+
+        {% if padrao1 %}
+        <div class="padrao">{{ padrao1 }}</div>
+        {% endif %}
+
+        {% if padrao2 %}
+        <div class="padrao">{{ padrao2 }}</div>
+        {% endif %}
+       <footer class="footer mt-auto py-3 bg-light">
+            <div class="container">
+                <span class="text-muted">© DFS 2026. Todos os direitos reservados.</span>
+            </div>
+        </footer>
+
+    </main>
+</div>
+     
+
+<script>
+const rota1 = document.getElementById("rota1");
+const rota2 = document.getElementById("rota2");
+const btn1 = document.getElementById("btn1");
+const btn2 = document.getElementById("btn2");
+const compareBtn = document.getElementById("compareBtn");
+const loading = document.getElementById("loading");
+const form = document.getElementById("uploadForm");
+
+btn1.onclick = () => rota1.click();
+btn2.onclick = () => rota2.click();
+
+function checkFiles() {
+    if (rota1.files.length > 0 || rota2.files.length > 0) {
+        compareBtn.disabled = false;
+    }
+}
+
+rota1.addEventListener("change", function() {
+    document.getElementById("file-name1").innerHTML =
+        "✔ " + this.files[0].name;
+    btn1.classList.add("loaded");
+    checkFiles();
+});
+
+rota2.addEventListener("change", function() {
+    document.getElementById("file-name2").innerHTML =
+        "✔ " + this.files[0].name;
+    btn2.classList.add("loaded");
+    checkFiles();
+});
+
+form.addEventListener("submit", function() {
+    loading.classList.remove("hidden");
+});
+</script>
+
+<script>
+
+function toggleFullscreen(id){
+
+    const el = document.getElementById(id);
+
+    if (!document.fullscreenElement) {
+        el.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
+
+}
+
+</script>
+
+
+</body>
+</html>

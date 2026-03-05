@@ -1,0 +1,247 @@
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: #f4f6f9;
+    text-align: center;
+}
+
+.layout {
+    display: flex;
+    height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 160px;
+    background: #0a1f44;
+    color: white;
+    padding: 15px;
+}
+
+.sidebar h2 {
+    margin-bottom: 30px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.sidebar li.active,
+.sidebar li:hover {
+    background: #132f66;
+}
+
+/* CONTENT */
+.content {
+    flex: 1;
+    padding: 10px 15px;
+    overflow-y: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.topbar {
+    margin-bottom: 10px;
+}
+.topbar h1 {
+    margin: 5px 0;
+    font-size: 22px;
+}
+
+/* UPLOAD CARD */
+.upload-card {
+    background: white;
+    padding: 8px 15px;
+    border-radius: 10px;
+    display: flex;
+    gap: 25px;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    flex-wrap: wrap;
+}
+
+.upload-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.upload-btn {
+    background: #0a1f44;
+    color: white;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.upload-btn:hover {
+    transform: translateY(-2px);
+    background: #132f66;
+}
+
+.upload-btn.loaded {
+    background: #28a745;
+}
+
+.file-name {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #333;
+}
+
+.btn-compare {
+    background: linear-gradient(135deg, #f4b400, #ffcc00);
+    border: none;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-compare:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.btn-compare:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+/* MAPS */
+.maps-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+    flex: 1;
+}
+
+.map-card {
+    flex: 1;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.01);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.map-card:hover {
+    transform: translateY(-2px);
+}
+
+.map-header {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    background: #fafafa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.map-content {
+    flex: 1;
+    position: relative;
+}
+
+/* MAPA OCUPANDO TODO O CARD */
+.map-content iframe,
+.map-content div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+/* LOADING */
+.loading {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
+}
+
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 3px solid #ccc;
+    border-top: 3px solid #0a1f44;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.padrao {
+    margin: 5px 10px;
+    padding: 6px 10px;
+    background: #eef3ff;
+    border-left: 4px solid #0a1f44;
+    font-size: 13px;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+.rota-badge {
+    background: #28a745;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+}
+/* Rodapé */
+.footer {
+    background-color: #003366 !important;
+    color: white;
+    text-align: center;
+    padding: 5px 0;
+}
+
+.footer .text-muted {
+    color: #ffffff !important;
+    font-size: 0.75rem;
+}
+
+.map-content iframe{
+    width:100% !important;
+    height:100% !important;
+}
+
+.map-content > div{
+    height:100% !important;
+}
+
+.btn-full{
+    background:#0a1f44;
+    color:white;
+    border:none;
+    padding:5px 10px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:12px;
+}
+
+.btn-full:hover{
+    background:#132f66;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
