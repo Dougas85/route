@@ -95,7 +95,9 @@ def gerar_mapa(pontos):
     mapa = folium.Map(
         location=[pontos[0]["lat"], pontos[0]["lon"]],
         zoom_start=14,
-        tiles="OpenStreetMap"
+        tiles="OpenStreetMap",
+        width='100%',
+        height='100%'
     )
 
     coords = [(p["lat"], p["lon"]) for p in pontos]
