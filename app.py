@@ -20,71 +20,67 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 # FUNÇÃO PARA LER KMZ
 # ================================
 def extrair_pontos_kmz(caminho_kmz):
+
+    with zipfile.ZipFile(caminho_kmz, 'r') as z:
+        nome_kml = [f for f in z.namelist() if f.endswith('.kml')][0]
+        kml_bytes = z.read(nome_kml)
+
+    kml_text = kml_bytes.decode("utf-8")
+
+    # Corrigir vírgula decimal
+    kml_text = re.sub(r'(\d),(\d)', r'\1.\2', kml_text)
+
+    root = ET.fromstring(kml_text)
+    ns = {'kml': 'http://www.opengis.net/kml/2.2'}
+
     pontos = []
-    try:
-        with zipfile.ZipFile(caminho_kmz, 'r') as z:
-            # Busca qualquer arquivo que termine com .kml
-            lista_arquivos = [f for f in z.namelist() if f.endswith('.kml')]
-            if not lista_arquivos:
-                return []
-            
-            kml_bytes = z.read(lista_arquivos[0])
 
-        # Tenta UTF-8, se falhar usa Latin-1 (comum em KMLs de GPS)
+    for placemark in root.findall(".//kml:Placemark", ns):
+
+        nome = placemark.find("kml:name", ns)
+        coord = placemark.find(".//kml:coordinates", ns)
+
+        if nome is None or coord is None:
+            continue
+
+        coord_text = coord.text.strip()
+        partes = coord_text.split(",")
+
+        if len(partes) < 2:
+            continue
+
+        lon_raw = partes[0]
+        lat_raw = partes[1]
+
+        def limpar_numero(valor):
+            valor = re.sub(r"[^0-9\.-]", "", valor)
+            if valor.count(".") > 1:
+                p = valor.split(".")
+                valor = p[0] + "." + "".join(p[1:])
+            return float(valor)
+
         try:
-            kml_text = kml_bytes.decode("utf-8")
-        except UnicodeDecodeError:
-            kml_text = kml_bytes.decode("latin-1")
+            lon = limpar_numero(lon_raw)
+            lat = limpar_numero(lat_raw)
+        except:
+            continue
 
-        # Limpeza de vírgulas decimais europeias/brasileiras para padrão americano
-        kml_text = re.sub(r'(\d),(\d)', r'\1.\2', kml_text)
+        pontos.append({
+            "nome": nome.text.strip(),
+            "lat": lat,
+            "lon": lon
+        })
 
-        root = ET.fromstring(kml_text)
-        
-        # Identifica o namespace dinamicamente (o link http://... que fica no início do XML)
-        ns_map = {}
-        if '}' in root.tag:
-            ns_url = root.tag.split('}')[0][1:]
-            ns_map = {'kml': ns_url}
-        else:
-            ns_map = {'kml': 'http://www.opengis.net/kml/2.2'}
+    # Ordenar pela sequência (se nome começar com número)
+    def extrair_seq(nome):
+        try:
+            return int(nome.split()[0])
+        except:
+            return 9999
 
-        # Busca todos os Placemarks de forma recursiva
-        for placemark in root.findall(".//kml:Placemark", ns_map):
-            nome_el = placemark.find("kml:name", ns_map)
-            coord_el = placemark.find(".//kml:coordinates", ns_map)
+    pontos = sorted(pontos, key=lambda x: extrair_seq(x["nome"]))
 
-            if coord_el is not None and coord_el.text:
-                # O KML pode ter várias coordenadas separadas por espaço (linha) 
-                # ou apenas uma (ponto). Pegamos a primeira.
-                coord_raw = coord_el.text.strip().split()[0]
-                partes = coord_raw.split(',')
-
-                if len(partes) >= 2:
-                    try:
-                        # Limpa caracteres invisíveis e converte
-                        lon = float(re.sub(r"[^0-9\.-]", "", partes[0]))
-                        lat = float(re.sub(r"[^0-9\.-]", "", partes[1]))
-                        nome = nome_el.text.strip() if nome_el is not None else "Ponto sem nome"
-
-                        pontos.append({
-                            "nome": nome,
-                            "lat": lat,
-                            "lon": lon
-                        })
-                    except (ValueError, IndexError):
-                        continue
-
-        # Ordenação baseada no número inicial do nome (ex: "1 - Entrega")
-        def extrair_seq(ponto):
-            match = re.search(r'^\d+', ponto["nome"])
-            return int(match.group()) if match else 9999
-
-        return sorted(pontos, key=extrair_seq)
-
-    except Exception as e:
-        print(f"Erro crítico no processamento: {e}")
-        return []
+    return pontos
 
 
 # ================================
@@ -95,9 +91,7 @@ def gerar_mapa(pontos):
     mapa = folium.Map(
         location=[pontos[0]["lat"], pontos[0]["lon"]],
         zoom_start=14,
-        tiles="OpenStreetMap",
-        width='100%',
-        height='100%'
+        tiles="OpenStreetMap"
     )
 
     coords = [(p["lat"], p["lon"]) for p in pontos]
